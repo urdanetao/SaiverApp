@@ -1,0 +1,9 @@
+{
+    "name": "smartsoft/saiverapp-backend",
+    "description": "Backend API REST para SaiverApp - Consultor de Precios",
+    "type": "project",
+    "require": {
+        "php": ">=8.0",
+        "phpmailer/phpmailer": "^6.12"
+    }
+}

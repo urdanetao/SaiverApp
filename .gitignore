@@ -1,0 +1,24 @@
+# Frontend
+Frontend/node_modules/
+Frontend/dist/
+Frontend/*.local
+
+# Backend
+Backend/vendor/
+Backend/composer.lock
+Backend/dbinfo.php
+Backend/data/
+Backend/log/
+
+# Android
+Android/build/
+Android/.gradle/
+Android/.kotlin/
+Android/local.properties
+Android/app/build/
+
+# General
+node_modules/
+dist/
+*.log
+.DS_Store

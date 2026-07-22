@@ -1,0 +1,50 @@
+<?php
+function envOrDefault($key, $default)
+{
+    $value = getenv($key);
+    if ($value === false || $value === '') {
+        return $default;
+    }
+
+    return $value;
+}
+
+// Información de conexión a MySql.
+define('__mysql_host', envOrDefault('SAIVERAPP_MYSQL_HOST', 'localhost'));
+define('__mysql_port', intval(envOrDefault('SAIVERAPP_MYSQL_PORT', '3306')));
+define('__mysql_prefix', envOrDefault('SAIVERAPP_MYSQL_PREFIX', ''));
+define('__mysql_user', envOrDefault('SAIVERAPP_MYSQL_USER', 'TU_USUARIO_MYSQL'));
+define('__mysql_pwd', envOrDefault('SAIVERAPP_MYSQL_PWD', 'TU_PASSWORD_MYSQL'));
+
+function getMySqlDbInfo($dbname)
+{
+    $dbInfo = array();
+    $dbInfo['host'] = __mysql_host;
+    $dbInfo['port'] = __mysql_port;
+    $dbInfo['prefix'] = __mysql_prefix;
+    $dbInfo['dbname'] = $dbname;
+    $dbInfo['user'] = __mysql_user;
+    $dbInfo['pwd'] = __mysql_pwd;
+
+    return $dbInfo;
+}
+
+// Información de conexión a SQL Server.
+define('__sql_host', envOrDefault('SAIVERAPP_SQL_HOST', 'TU_HOST_SQL_SERVER'));
+define('__sql_port', intval(envOrDefault('SAIVERAPP_SQL_PORT', '1433')));
+define('__sql_prefix', envOrDefault('SAIVERAPP_SQL_PREFIX', ''));
+define('__sql_user', envOrDefault('SAIVERAPP_SQL_USER', 'TU_USUARIO_SQL'));
+define('__sql_pwd', envOrDefault('SAIVERAPP_SQL_PWD', 'TU_PASSWORD_SQL'));
+
+function getSqlDbInfo($dbname)
+{
+    $dbInfo = array();
+    $dbInfo['host'] = __sql_host;
+    $dbInfo['port'] = __sql_port;
+    $dbInfo['prefix'] = __sql_prefix;
+    $dbInfo['dbname'] = $dbname;
+    $dbInfo['user'] = __sql_user;
+    $dbInfo['pwd'] = __sql_pwd;
+
+    return $dbInfo;
+}
