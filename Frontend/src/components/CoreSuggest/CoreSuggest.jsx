@@ -161,6 +161,9 @@ const CoreSuggest = forwardRef(({
 		focus: () => {
 			focusInput({ suppressOpenOnFocus: true });
 		},
+		skipNextBlurCommit: () => {
+			skipNextBlurCommitRef.current = true;
+		},
 	}));
 
 	const normalizedOptions = useMemo(

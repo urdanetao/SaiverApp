@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { IoSearchOutline, IoInformationCircleOutline, IoScanOutline } from 'react-icons/io5';
 import { CoreWindow, CoreVSep, CoreSuggest, BarcodeScanner } from '../../components';
 import { ENTRY_MODE } from '../../util/constants';
@@ -7,6 +7,7 @@ import useLazyFetch from '../../hooks/useLazyFetch/useLazyFetch';
 
 const Consultor = ({ onBack }) => {
     const { fetchData } = useLazyFetch();
+    const suggestRef = useRef(null);
     const [searchId, setSearchId] = useState('');
     const [allProducts, setAllProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -52,6 +53,7 @@ const Consultor = ({ onBack }) => {
             setSelectedProduct(null);
         } finally {
             setSearchId('');
+            suggestRef.current?.skipNextBlurCommit();
             if (document.activeElement) document.activeElement.blur();
         }
     }, [fetchData]);
@@ -60,6 +62,7 @@ const Consultor = ({ onBack }) => {
         if (option) {
             setSelectedProduct(option);
         }
+        setError('');
         setSearchId('');
         setTimeout(() => {
             if (document.activeElement) document.activeElement.blur();
@@ -68,7 +71,7 @@ const Consultor = ({ onBack }) => {
 
     const handleScan = useCallback((code) => {
         setShowScanner(false);
-        handleSearch(code);
+        handleSearch(code.toUpperCase());
     }, [handleSearch]);
 
     useEffect(() => {
@@ -206,6 +209,7 @@ const Consultor = ({ onBack }) => {
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
                                 <CoreSuggest
+                                    ref={suggestRef}
                                     label="Producto"
                                     value={searchId}
                                     onChange={(e) => {
@@ -221,13 +225,13 @@ const Consultor = ({ onBack }) => {
                                         ...r,
                                         id: r.codprod,
                                         text1: r.descrip,
-                                        text2: `${r.codprod} - ${r.descrip}`,
                                     }))}
                                     fieldId="id"
                                     displayField="text1"
-                                    listDisplayField="text2"
+                                    listDisplayField="text1"
                                     filterFields={['codprod', 'codbarra', 'descrip']}
                                     width="100%"
+                                    listDisplayWidth="calc(100% + 44px)"
                                     showMaxItems={7}
                                     ignoreFormState={true}
                                     entryMode={ENTRY_MODE.UPPER}
