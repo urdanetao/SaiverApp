@@ -56,6 +56,7 @@ No hay suite de tests. No ejecutar `npm test` (no existe).
 - `saintProductosLoad` busca por codigo, codigo de barras o descripcion, y retorna precios en Bs/USD/COP con y sin IGTF.
 - `dbinfo.php` NO se sube al repo. Usar `dbinfo.php.example` como template. Se configuran variables de entorno o se editan los defaults.
 - CORS: `api.php` tiene whitelist de origenes. En el repo, las IPs locales estan como `TU_IP_LOCAL`.
+- **Nota:** En XAMPP (`C:\xampp\htdocs\smartsoft\saiverapp`) hay una copia del Backend con la IP local real (`192.168.1.20`). Para evitar duplicacion, se puede usar un symlink: `mklink /D "C:\xampp\htdocs\smartsoft\saiverapp" "C:\source\react\smartsoft\saiverapp\Backend"`.
 
 ### Android
 - `MainActivity.kt`: WebView que carga la URL de produccion (`https://almacenadorasaiver.com/saiverapp`). `BASE_URL` se puede cambiar para dev.
@@ -68,13 +69,24 @@ No hay suite de tests. No ejecutar `npm test` (no existe).
 
 - Al abrir se precargan TODOS los productos en el `CoreSuggest` (via `saintProductosLoad` con `id: ''`).
 - El `CoreSuggest` filtra localmente por codigo, codigo de barras o descripcion.
+- La lista desplegable muestra solo la descripcion (`listDisplayField="text1"`), no el codigo.
+- Ancho de la lista: `listDisplayWidth="calc(100% + 44px)"` para llegar al borde del boton de escanear.
 - Al seleccionar del dropdown o presionar Enter, se busca via API y se muestra el producto.
 - Al escanear barcode:
   - En Android: `Android.scanBarcode()` abre `BarcodeScannerActivity` (CameraX + ML Kit).
   - En navegador: se usa `BarcodeScanner` (html5-qrcode) como fallback.
+  - El codigo escaneado se convierte aUpperCase antes de buscar (consistencia con `ENTRY_MODE.UPPER`).
   - El codigo escaneado se envia a `saintProductosLoad` que busca en `codprod`, `refere` (codbarra) o `descrip`.
+- Fix race condition: `CoreSuggest.skipNextBlurCommit()` evita que el `handleBlur` sobreescriba el resultado de la API despues de un scan. Se usa via `suggestRef` en `handleSearch`.
+- `handleSelectProduct` limpia el error (`setError('')`) para que no persista al seleccionar del dropdown.
 - Despues de mostrar resultados, el `CoreSuggest` queda en blanco y la info del producto persiste.
 - `ENTRY_MODE.UPPER` para el CoreSuggest.
+
+## CoreSuggest — Props y metodos
+
+- `listDisplayField`: campo para mostrar en la lista desplegable (por defecto usa `displayField`).
+- `listDisplayWidth`: ancho de la lista desplegable (por defecto igual al `width` del input).
+- `ref.skipNextBlurCommit()`: metodo expuesto via `useImperativeHandle` para evitar que `handleBlur` haga commit del valor del input. Usar antes de `blur()` cuando se busca via API (scan/enter) para evitar race conditions.
 
 ## Convenciones
 
@@ -85,3 +97,10 @@ No hay suite de tests. No ejecutar `npm test` (no existe).
 - Admin check: `sessionData?.user?.admin === '1'` (string comparison).
 - Sesion almacenada en `sessionStorage` bajo la key `sessionData`.
 - Produccion: `https://almacenadorasaiver.com/saiverapp/`
+
+## Despliegue
+
+- Frontend se compila con `npm run build` (desde `Frontend/`).
+- El build resultante (`Frontend/dist/`) se sube manualmente al servidor de produccion.
+- No hay CI/CD configurado.
+- **IMPORTANTE:** No ejecutar `npm run build` desde la raiz del proyecto (crea `dist/` y `node_modules/` en la raíz por error).
